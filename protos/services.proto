@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package test;
+
+// The test service definition.
+service Test {
+    rpc Cat (CatRequest) returns (CatReply) {}
+}
+
+message CatRequest {
+    string filename = 1;
+}
+
+message CatReply {
+    string message = 1;
+}
