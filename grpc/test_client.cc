@@ -10,8 +10,8 @@ using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 
-using test::CatRequest;
-using test::CatReply;
+using test::StrRequest;
+using test::StrReply;
 using test::Test;
 
 class TestClient {
@@ -21,24 +21,24 @@ class TestClient {
 
     // Assembles the client's payload, sends it and presents the response back
     // from the server.
-    std::string Cat(const std::string& filename) {
+    std::string Echo(const std::string& str) {
         // Data we are sending to the server.
-        CatRequest request;
-        request.set_filename(filename);
+        StrRequest request;
+        request.set_str(str);
 
         // Container for the data we expect from the server.
-        CatReply reply;
+        StrReply reply;
 
         // Context for the client. It could be used to convey extra information to
         // the server and/or tweak certain RPC behaviors.
         ClientContext context;
 
         // The actual RPC.
-        Status status = stub_->Cat(&context, request, &reply);
+        Status status = stub_->Echo(&context, request, &reply);
 
         // Act upon its status.
         if (status.ok()) {
-            return reply.message();
+            return reply.str();
         } else {
             std::cout << status.error_code() << ": " << status.error_message()
                       << std::endl;
@@ -51,35 +51,12 @@ class TestClient {
 };
 
 int main(int argc, char** argv) {
-    // Instantiate the client. It requires a channel, out of which the actual RPCs
-    // are created. This channel models a connection to an endpoint specified by
-    // the argument "--target=" which is the only expected argument.
-    // We indicate that the channel isn't authenticated (use of
-    // InsecureChannelCredentials()).
-    std::string target_str;
-    std::string arg_str("--target");
-    if (argc > 1) {
-        std::string arg_val = argv[1];
-        size_t start_pos = arg_val.find(arg_str);
-        if (start_pos != std::string::npos) {
-            start_pos += arg_str.size();
-            if (arg_val[start_pos] == '=') {
-                target_str = arg_val.substr(start_pos + 1);
-            } else {
-                std::cout << "The only correct argument syntax is --target=" << std::endl;
-                return 0;
-            }
-        } else {
-            std::cout << "The only acceptable argument is --target=" << std::endl;
-            return 0;
-        }
-    } else {
-        target_str = "localhost:50051";
-    }
+    std::string str = "";
+    if (argc > 1)
+        str = argv[1];
     TestClient test(grpc::CreateChannel(
-                        target_str, grpc::InsecureChannelCredentials()));
-    std::string filename("/etc/hosts");
-    std::string reply = test.Cat(filename);
+                        "localhost:50051", grpc::InsecureChannelCredentials()));
+    std::string reply = test.Echo(str);
     std::cout << "Test received: " << reply << std::endl;
 
     return 0;

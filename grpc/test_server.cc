@@ -19,8 +19,8 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
 
-using test::CatRequest;
-using test::CatReply;
+using test::StrRequest;
+using test::StrReply;
 using test::Test;
 
 static std::string load(const std::string& path) {
@@ -42,9 +42,9 @@ static std::string load(const std::string& path) {
 
 // Logic and data behind the server's behavior.
 class TestServiceImpl final : public Test::Service {
-    Status Cat(ServerContext* context, const CatRequest* request,
-               CatReply* reply) override {
-        reply->set_message(load(request->filename()));
+    Status Echo(ServerContext* context, const StrRequest* request,
+                StrReply* reply) override {
+        reply->set_str(request->str());
         return Status::OK;
     }
 };

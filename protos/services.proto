@@ -4,13 +4,13 @@ package test;
 
 // The test service definition.
 service Test {
-    rpc Cat (CatRequest) returns (CatReply) {}
+    rpc Echo (StrRequest) returns (StrReply) {}
 }
 
-message CatRequest {
-    string filename = 1;
+message StrRequest {
+    string str = 1;
 }
 
-message CatReply {
-    string message = 1;
+message StrReply {
+    string str = 1;
 }
